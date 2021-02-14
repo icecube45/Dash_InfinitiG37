@@ -91,7 +91,7 @@ void InfinitiG37::updateClimateDisplay(QByteArray payload){
     bool hvacOff = payload.at(0) & 1;
     if(hvacOff != oldStatus){
         oldStatus = hvacOff;
-        if(hvacOFF){
+        if(hvacOff){
             climate->airflow(Airflow::OFF);
             climate->fan_speed(0);
             G37_LOG(info)<<"Climate is off";
