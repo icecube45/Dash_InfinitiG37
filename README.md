@@ -9,6 +9,10 @@ Current functionality:
 
 
 
+This repo also contains a .dbc file that I use for reverse engineering the signals of the G37 from within my fork of [Cabana](https://github.com/icecube45/cabana)
+
+
+
 It is likely that this plugin works with other years of G37, or even across the Nissan/Infiniti lines. However I make no garuntees.
 
 
