@@ -1,26 +1,25 @@
 #include "infiniti_g37.hpp"
 
-Theme* InfinitiG37::theme = nullptr;
-Climate* InfinitiG37::climate = nullptr;
-bool InfinitiG37::duelClimate = false;
 
 
 bool InfinitiG37::init(ICANBus* canbus){
     this->duelClimate=false;
-    this->theme = Theme::get_instance();
-    this->climate = new Climate();
-    this->climate->max_fan_speed(7);
-    this->climate->setObjectName("Climate");
-    std::function<void(QByteArray)> headlightCallback = InfinitiG37::monitorHeadlightStatus;
-    canbus->registerFrameHandler(0x60D, headlightCallback);
-    std::function<void(QByteArray)> climateControlCallback = InfinitiG37::updateClimateDisplay;
-    canbus->registerFrameHandler(0x54B, climateControlCallback);
-    std::function<void(QByteArray)> temperatureControlCallback = InfinitiG37::updateTemperatureDisplay;
-    canbus->registerFrameHandler(0x542, temperatureControlCallback);
+    if (this->arbiter) {
+        this->climate = new Climate(*this->arbiter);
+        this->climate->max_fan_speed(7);
+        this->climate->setObjectName("Climate");
+        canbus->registerFrameHandler(0x60D, [this](QByteArray payload){this->monitorHeadlightStatus(payload);});
+        canbus->registerFrameHandler(0x54B, [this](QByteArray payload){this->updateClimateDisplay(payload);});
+        canbus->registerFrameHandler(0x542, [this](QByteArray payload){this->updateTemperatureDisplay(payload);});
+        G37_LOG(info)<<"loaded successfully";
+        return true;
+    }
+    else{
+        G37_LOG(error)<<"Failed to get arbiter";
+        return false;
+    }
     
 
-    G37_LOG(info)<<"loaded successfully";
-    return true;
 }
 
 QList<QWidget *> InfinitiG37::widgets()
@@ -41,16 +40,14 @@ QList<QWidget *> InfinitiG37::widgets()
 void InfinitiG37::monitorHeadlightStatus(QByteArray payload){
     if((payload.at(0)>>1) & 1){
         //headlights are ON - turn to dark mode
-        if(theme->get_mode() != true){
-            theme->set_mode(true);
-            theme->update();
+        if(this->arbiter->theme().mode == Session::Theme::Light){
+            this->arbiter->set_mode(Session::Theme::Dark);
         }
     }
     else{
         //headlights are off or not fully on (i.e. sidelights only) - make sure is light mode
-        if(theme->get_mode() != false){
-            theme->set_mode(false);
-            theme->update();
+        if(this->arbiter->theme().mode == Session::Theme::Dark){
+            this->arbiter->set_mode(Session::Theme::Light);
         }
     }
 }
