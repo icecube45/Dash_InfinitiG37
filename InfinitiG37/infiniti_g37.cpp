@@ -8,9 +8,15 @@ bool InfinitiG37::init(ICANBus* canbus){
         this->climate = new Climate(*this->arbiter);
         this->climate->max_fan_speed(7);
         this->climate->setObjectName("Climate");
+
+        this->debug = new DebugWindow(*this->arbiter);
+
         canbus->registerFrameHandler(0x60D, [this](QByteArray payload){this->monitorHeadlightStatus(payload);});
         canbus->registerFrameHandler(0x54B, [this](QByteArray payload){this->updateClimateDisplay(payload);});
         canbus->registerFrameHandler(0x542, [this](QByteArray payload){this->updateTemperatureDisplay(payload);});
+        canbus->registerFrameHandler(0x551, [this](QByteArray payload){this->engineUpdate(payload);});
+        canbus->registerFrameHandler(0x385, [this](QByteArray payload){this->tpmsUpdate(payload);});
+
         G37_LOG(info)<<"loaded successfully";
         return true;
     }
@@ -26,8 +32,55 @@ QList<QWidget *> InfinitiG37::widgets()
 {
     QList<QWidget *> tabs;
     tabs.append(this->climate);
+    tabs.append(this->debug);
     return tabs;
 }
+
+
+// TPMS
+// 385
+// THIRD BYTE:
+//  Tire Pressure (PSI) * 4
+// FOURTH BYTE:
+//  Tire Pressure (PSI) * 4
+// FIFTH BYTE:
+//  Tire Pressure (PSI) * 4
+// SIXTH BYTE:
+//  Tire Pressure (PSI) * 4
+// SEVENTH BYTE:
+// |Tire 1 Pressure Valid|Tire 2 Pressure Valid|Tire 3 Pressure Valid|Tire 4 Pressure Valid|unknown|unknown|unknown|unknown
+
+// OTHERS UNKNOWN
+
+void InfinitiG37::tpmsUpdate(QByteArray payload){
+    this->debug->tpmsOne->setText(QString::number((uint8_t)payload.at(2)/4));
+    this->debug->tpmsTwo->setText(QString::number((uint8_t)payload.at(3)/4));
+    this->debug->tpmsThree->setText(QString::number((uint8_t)payload.at(4)/4));
+    this->debug->tpmsFour->setText(QString::number((uint8_t)payload.at(5)/4));
+}
+
+//551
+//(A, B, C, D, E, F, G, H)
+// D - Bitfield.
+
+//     0xA0 / 160 - Engine off, "On"
+//     0x20 / 32 - Engine turning on (500ms)
+//     0x00 / 0 - Engine turning on (2500ms)
+//     0x80 / 128 - Engine running
+//     0x00 / 0 - Engine shutting down (2500ms)
+//     0x20 / 32 - Engine off
+
+
+void InfinitiG37::engineUpdate(QByteArray payload){
+    if((payload.at(3) == 0x80)) engineRunning = true;
+    else
+    {
+        if(engineRunning)
+            this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::PAUSE);
+        engineRunning = false;
+    }
+}
+
 
 // HEADLIGHTS AND DOORS
 // 60D
@@ -145,3 +198,45 @@ void InfinitiG37::updateTemperatureDisplay(QByteArray payload){
     }
 }
 
+
+
+
+DebugWindow::DebugWindow(Arbiter &arbiter, QWidget *parent) : QWidget(parent)
+{
+    this->setObjectName("Debug");
+
+
+    QLabel* textOne = new QLabel("TPMS 1", this);
+    QLabel* textTwo = new QLabel("TPMS 2", this);
+    QLabel* textThree = new QLabel("TPMS 3", this);
+    QLabel* textFour = new QLabel("TPMS 4", this);
+
+    tpmsOne = new QLabel("--", this);
+    tpmsTwo = new QLabel("--", this);
+    tpmsThree = new QLabel("--", this);
+    tpmsFour = new QLabel("--", this);
+
+
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    layout->addWidget(textOne);
+    layout->addWidget(tpmsOne);
+    layout->addWidget(Session::Forge::br(false));
+
+    layout->addWidget(textTwo);
+    layout->addWidget(tpmsTwo);
+    layout->addWidget(Session::Forge::br(false));
+
+    layout->addWidget(textThree);
+    layout->addWidget(tpmsThree);
+    layout->addWidget(Session::Forge::br(false));
+
+    layout->addWidget(textFour); 
+    layout->addWidget(tpmsFour);
+    layout->addWidget(Session::Forge::br(false));
+
+
+
+
+}
