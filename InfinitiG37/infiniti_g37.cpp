@@ -206,10 +206,10 @@ DebugWindow::DebugWindow(Arbiter &arbiter, QWidget *parent) : QWidget(parent)
     this->setObjectName("Debug");
 
 
-    QLabel* textOne = new QLabel("TPMS 1", this);
-    QLabel* textTwo = new QLabel("TPMS 2", this);
-    QLabel* textThree = new QLabel("TPMS 3", this);
-    QLabel* textFour = new QLabel("TPMS 4", this);
+    QLabel* textOne = new QLabel("Front Right PSI", this);
+    QLabel* textTwo = new QLabel("Front Left PSI", this);
+    QLabel* textThree = new QLabel("Rear Right PSI", this);
+    QLabel* textFour = new QLabel("Rear Left PSI", this);
 
     tpmsOne = new QLabel("--", this);
     tpmsTwo = new QLabel("--", this);
