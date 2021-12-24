@@ -16,7 +16,7 @@ This repo also contains a .dbc file that I use for reverse engineering the signa
 
 
 
-It is likely that this plugin works with other years of G37, or even across the Nissan/Infiniti lines. However I make no garuntees.
+It is likely that this plugin works with other years of G37, or even across the Nissan/Infiniti lines. However I make no guarantees.
 
 
 
