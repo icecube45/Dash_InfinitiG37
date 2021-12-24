@@ -6,6 +6,9 @@ Current functionality:
 
 * Automatic day/night theme switching based on the headlight status of the car
 * HVAC/Climate Integration (read only)
+* Tire Pressure Monitoring
+* Dash Vehicle Widget Integration (headlight status, taillight status, blinkers, doors open/close)
+* Pause android auto music when the engine turns off
 
 
 
