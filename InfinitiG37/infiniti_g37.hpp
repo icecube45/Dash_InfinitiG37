@@ -7,6 +7,7 @@
 
 #include "plugins/vehicle_plugin.hpp"
 #include "app/widgets/climate.hpp"
+#include "app/widgets/vehicle.hpp"
 #include "app/arbiter.hpp"
 #include "openauto/Service/InputService.hpp"
 
@@ -33,22 +34,41 @@ class InfinitiG37 : public QObject, VehiclePlugin
     Q_INTERFACES(VehiclePlugin)
 
     public:
+        InfinitiG37() {};
+        ~InfinitiG37();
         bool init(ICANBus* canbus) override;
-
-    private:
         QList<QWidget *> widgets() override;
 
+    private:
+
         bool duelClimate;
+
+        bool frDoor = false;
+        bool flDoor = false;
+        bool rrDoor = false;
+        bool rlDoor = false;
+
+        bool lTurn = false;
+        bool rTurn = false;
+
+        bool brakePedal = false;
+
+        uint8_t frPressure = 0;
+        uint8_t flPressure = 0;
+        uint8_t rrPressure = 0;
+        uint8_t rlPressure = 0;
 
         void monitorHeadlightStatus(QByteArray payload);
         void updateClimateDisplay(QByteArray payload);
         void updateTemperatureDisplay(QByteArray payload);
         void engineUpdate(QByteArray payload);
         void tpmsUpdate(QByteArray payload);
-
+        void brakePedalUpdate(QByteArray payload);
+        void steeringWheelUpdate(QByteArray payload);
 
 
         Climate *climate;
+        Vehicle *vehicle;
         DebugWindow *debug;
         bool engineRunning = false;
 };
