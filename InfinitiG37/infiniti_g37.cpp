@@ -14,7 +14,7 @@ InfinitiG37::~InfinitiG37()
 bool InfinitiG37::init(ICANBus* canbus){
     this->duelClimate=false;
     if (this->arbiter) {
-        this->aa_handler = this->arbiter->android_auto->handler;
+        this->aa_handler = this->arbiter->android_auto().handler;
         this->climate = new Climate(*this->arbiter);
         this->climate->max_fan_speed(7);
         this->climate->setObjectName("Climate");
