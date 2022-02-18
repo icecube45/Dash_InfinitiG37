@@ -14,7 +14,7 @@ InfinitiG37::~InfinitiG37()
 bool InfinitiG37::init(ICANBus* canbus){
     this->duelClimate=false;
     if (this->arbiter) {
-        this->aa_interface = AAInterface::get_instance();
+        this->aa_handler = this->arbiter->android_auto->handler;
         this->climate = new Climate(*this->arbiter);
         this->climate->max_fan_speed(7);
         this->climate->setObjectName("Climate");
@@ -107,7 +107,7 @@ void InfinitiG37::engineUpdate(QByteArray payload){
     else
     {
         if(engineRunning)
-            this->aa_interface->injectButtonPress(aasdk::proto::enums::ButtonCode::PAUSE);
+            this->aa_handler->injectButtonPress(aasdk::proto::enums::ButtonCode::PAUSE);
         engineRunning = false;
     }
 }

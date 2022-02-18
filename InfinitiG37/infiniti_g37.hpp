@@ -10,7 +10,7 @@
 #include "app/widgets/vehicle.hpp"
 #include "app/arbiter.hpp"
 #include "openauto/Service/InputService.hpp"
-#include "AAInterface.hpp"
+#include "AAHandler.hpp"
 
 
 #define G37_LOG(severity) BOOST_LOG_TRIVIAL(severity) << "[G37VehiclePlugin] "
@@ -70,7 +70,7 @@ class InfinitiG37 : public QObject, VehiclePlugin
 
         Climate *climate;
         Vehicle *vehicle;
-        AAInterface *aa_interface;
+        AAHandler *aa_handler;
         DebugWindow *debug;
         bool engineRunning = false;
 };
