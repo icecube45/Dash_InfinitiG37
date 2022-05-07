@@ -124,7 +124,7 @@ void InfinitiG37::steeringWheelUpdate(QByteArray payload){
     else degAngle = rawAngle/10;
     degAngle = degAngle/16.4;
     this->vehicle->wheel_steer(degAngle);
-    G37_LOG(info)<<"raw: "<<rawAngle<<" deg "<<degAngle;
+    //G37_LOG(info)<<"raw: "<<rawAngle<<" deg "<<degAngle;
 }
 
 //354
